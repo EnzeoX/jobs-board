@@ -14,10 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Nikolay Boyko
@@ -93,16 +90,43 @@ public class JobService {
             log.warn("List is null or empty, nothing to save in DB");
             return;
         }
-//        for (JobEntity jobEntity : list) {
-//            if (jobEntity == null) return;
-//            Optional<JobCompanyEntity> jobCompanyEntity = jobCompanyRepository.findOne(Example.of(jobEntity.getCompany()));
-//            if (jobCompanyEntity.isPresent()) {
-//
-//            }
-//        }
+        for (JobEntity job : list) {
+            if (job == null) return;
+            Optional<JobCompanyEntity> company = jobCompanyRepository.findByCompanyName(job.getCompany().getCompanyName());
+            company.ifPresent(c -> {
+                c.getJobs().add(job);
+                job.setCompany(c);
+            });
+
+            Optional<JobLocationEntity> location = jobLocationRepository.findByLocation(job.getLocation().getLocation());
+            location.ifPresent(l -> {
+                l.getJobs().add(job);
+                job.setLocation(l);
+            });
+
+            List<String> typeNames = job.getTypes().stream()
+                    .map(JobTypeEntity::getType)
+                    .toList();
+            Set<JobTypeEntity> types = jobTypeRepository.findAllByTypeInIterable(typeNames);
+            if (!types.isEmpty()) {
+                job.getTypes().addAll(types);
+                job.getTypes().forEach(type -> {
+                    type.getJobs().add(job);
+                });
+            }
+            List<String> tagNames = job.getTags().stream()
+                    .map(JobTagEntity::getTag)
+                    .toList();
+            Set<JobTagEntity> tags = jobTagRepository.findAllByTagInIterable(tagNames);
+            if (!tags.isEmpty()) {
+                job.getTags().addAll(tags);
+                job.getTags().forEach(tag -> {
+                    tag.getJobs().add(job);
+                });
+            }
+            log.info("Saving job entity: {}", job);
+            jobRepository.save(job);
+        }
         jobRepository.saveAll(list);
     }
-
-
-
 }

@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "job_tags")
+@EqualsAndHashCode(exclude = {"id", "jobs"})
 public class JobTagEntity {
 
     @Id
@@ -24,14 +25,14 @@ public class JobTagEntity {
     private int id;
 
     @Column(name = "tag", unique = true, nullable = false)
-    private String tag;
+    private String tag = "";
 
     @ManyToMany(targetEntity = JobEntity.class,fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = "tags",
-//            joinColumns = @JoinColumn(name = "tag_id"),
-//            inverseJoinColumns = @JoinColumn(name = "job_id")
-//    )
+    @JoinTable(
+            name = "tags",
+            joinColumns = @JoinColumn(name = "tag_id"),
+            inverseJoinColumns = @JoinColumn(name = "job_id")
+    )
     private List<JobEntity> jobs;
 
 }

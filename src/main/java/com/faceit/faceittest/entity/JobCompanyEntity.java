@@ -24,14 +24,14 @@ public class JobCompanyEntity {
     private int id;
 
     @Column(name = "company")
-    private String companyName;
+    private String companyName = "";
 
     @ManyToMany(targetEntity = JobEntity.class,fetch = FetchType.LAZY)
 //    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = "companies",
-//            joinColumns = @JoinColumn(name = "company_id"),
-//            inverseJoinColumns = @JoinColumn(name = "job_id")
-//    )
+    @JoinTable(
+            name = "companies",
+            joinColumns = @JoinColumn(name = "company_id"),
+            inverseJoinColumns = @JoinColumn(name = "job_id")
+    )
     private List<JobEntity> jobs;
 }

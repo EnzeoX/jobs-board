@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -44,26 +45,26 @@ public class JobEntity {
     private Date createdAt;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=JobCompanyEntity.class)
-//    @JoinColumn(name = "company_id")
-    private JobCompanyEntity company;
+    @JoinColumn(name = "company_id")
+    private JobCompanyEntity company = new JobCompanyEntity();
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=JobLocationEntity.class)
-//    @JoinColumn(name = "location_id")
-    private JobLocationEntity location;
+    @JoinColumn(name = "location_id")
+    private JobLocationEntity location = new JobLocationEntity();
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=JobTagEntity.class)
-//    @JoinTable(
-//            name = "tags",
-//            joinColumns = @JoinColumn(name = "job_id"),
-//            inverseJoinColumns = @JoinColumn(name = "tag_id")
-//    )
-    private Set<JobTagEntity> tags;
+    @JoinTable(
+            name = "tags",
+            joinColumns = @JoinColumn(name = "job_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<JobTagEntity> tags = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    @JoinTable(
-//            name = "types",
-//            joinColumns = @JoinColumn(name = "job_id"),
-//            inverseJoinColumns = @JoinColumn(name = "type_id")
-//    )
-    private Set<JobTypeEntity> types;
+    @JoinTable(
+            name = "types",
+            joinColumns = @JoinColumn(name = "job_id"),
+            inverseJoinColumns = @JoinColumn(name = "type_id")
+    )
+    private Set<JobTypeEntity> types = new HashSet<>();
 }

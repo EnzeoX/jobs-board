@@ -25,14 +25,14 @@ public class JobLocationEntity {
     private int id;
 
     @Column(name = "location", unique = true, nullable = false)
-    private String location;
+    private String location = "";
 
     @ManyToMany(targetEntity = JobEntity.class,fetch = FetchType.LAZY)
 //    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = "locations",
-//            joinColumns = @JoinColumn(name = "location_id"),
-//            inverseJoinColumns = @JoinColumn(name = "job_id")
-//    )
+    @JoinTable(
+            name = "locations",
+            joinColumns = @JoinColumn(name = "location_id"),
+            inverseJoinColumns = @JoinColumn(name = "job_id")
+    )
     private List<JobEntity> jobs;
 }
