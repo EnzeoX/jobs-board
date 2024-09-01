@@ -8,13 +8,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * @author Nikolay Boyko
@@ -43,12 +47,12 @@ public class JobService {
 //        jobEntity.setCompany(jobCompanyEntity);
 
         List<JobTagEntity> jobTagEntityList = List.of(JobTagEntity.builder()
-                .tag("Electrical Engineering")
+                .tagName("Electrical Engineering")
                 .build());
 //        jobEntity.setTags(jobTagEntityList);
 
         JobLocationEntity jobLocationEntity = JobLocationEntity.builder()
-                .location("Lübeck")
+                .locationName("Lübeck")
                 .build();
 //        jobEntity.setLocation(jobLocationEntity);
         saveAll(list);
@@ -92,41 +96,63 @@ public class JobService {
         }
         for (JobEntity job : list) {
             if (job == null) return;
-            Optional<JobCompanyEntity> company = jobCompanyRepository.findByCompanyName(job.getCompany().getCompanyName());
-            company.ifPresent(c -> {
-                c.getJobs().add(job);
-                job.setCompany(c);
-            });
 
-            Optional<JobLocationEntity> location = jobLocationRepository.findByLocation(job.getLocation().getLocation());
-            location.ifPresent(l -> {
-                l.getJobs().add(job);
-                job.setLocation(l);
-            });
+            JobCompanyEntity company = job.getCompany();
+            JobCompanyEntity existingCompany = jobCompanyRepository.findByCompanyName(company.getCompanyName());
+            if (existingCompany != null) {
+                job.setCompany(existingCompany);
+            } else {
+                job.setCompany(jobCompanyRepository.save(company));
+            }
 
-            List<String> typeNames = job.getTypes().stream()
-                    .map(JobTypeEntity::getType)
-                    .toList();
-            Set<JobTypeEntity> types = jobTypeRepository.findAllByTypeInIterable(typeNames);
-            if (!types.isEmpty()) {
-                job.getTypes().addAll(types);
-                job.getTypes().forEach(type -> {
-                    type.getJobs().add(job);
-                });
+            JobLocationEntity location = job.getLocation();
+            JobLocationEntity existingLocation = jobLocationRepository.findByLocationName(location.getLocationName());
+            if (existingLocation != null) {
+                job.setLocation(existingLocation);
+            } else {
+                job.setLocation(jobLocationRepository.save(location));
             }
-            List<String> tagNames = job.getTags().stream()
-                    .map(JobTagEntity::getTag)
-                    .toList();
-            Set<JobTagEntity> tags = jobTagRepository.findAllByTagInIterable(tagNames);
-            if (!tags.isEmpty()) {
-                job.getTags().addAll(tags);
-                job.getTags().forEach(tag -> {
-                    tag.getJobs().add(job);
-                });
+
+            Set<JobTagEntity> tags = job.getTags();
+            Set<JobTagEntity> savedTags = new HashSet<>();
+            for (JobTagEntity tag : tags) {
+                if (tag.getTagName().equals("Remote")) {
+                    log.info("Remote tag");
+                }
+                JobTagEntity existingTag = jobTagRepository.findByTagName(tag.getTagName());
+                if (existingTag == null) {
+                    try {
+                        savedTags.add(jobTagRepository.save(tag));
+                    } catch (DataIntegrityViolationException e) {
+                        // Handle unique constraint violation
+                        existingTag = jobTagRepository.findByTagName(tag.getTagName());
+                        if (existingTag != null) {
+                            savedTags.add(existingTag);
+                        } else {
+                            throw e; // Re-throw if the error is not due to duplication
+                        }
+                    }
+                } else {
+                    existingTag.getJobs().add(job);
+                }
+                savedTags.add(existingTag);
             }
-            log.info("Saving job entity: {}", job);
+            job.setTags(savedTags);
+
+            Set<JobTypeEntity> types = job.getTypes();
+            Set<JobTypeEntity> savedTypes = new HashSet<>();
+            for (JobTypeEntity type : types) {
+                JobTypeEntity existingType = jobTypeRepository.findByTypeName(type.getTypeName());
+                if (existingType != null) {
+                    existingType.getJobs().add(job);
+                } else {
+                    existingType = jobTypeRepository.save(type);
+                }
+                savedTypes.add(existingType);
+            }
+            job.setTypes(savedTypes);
+
             jobRepository.save(job);
         }
-        jobRepository.saveAll(list);
     }
 }

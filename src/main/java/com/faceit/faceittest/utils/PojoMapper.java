@@ -80,18 +80,18 @@ public class PojoMapper {
             // Set company
             JobCompanyEntity jobCompanyEntity = new JobCompanyEntity();
             jobCompanyEntity.setCompanyName(job.getCompanyName());
-//            jobEntity.setCompany(jobCompanyEntity);
+            jobEntity.setCompany(jobCompanyEntity);
 
             // Set location
             JobLocationEntity jobLocationEntity = new JobLocationEntity();
-            jobLocationEntity.setLocation(job.getLocation());
+            jobLocationEntity.setLocationName(job.getLocation());
             jobEntity.setLocation(jobLocationEntity);
 
             // Set tags
             Set<JobTagEntity> jobTagEntityList = new HashSet<>();
             for (String jobTag : job.getJobTags()) {
                 JobTagEntity jobTagEntity = new JobTagEntity();
-                jobTagEntity.setTag(jobTag);
+                jobTagEntity.setTagName(jobTag);
                 jobTagEntityList.add(jobTagEntity);
             }
             jobEntity.setTags(jobTagEntityList);
@@ -100,7 +100,7 @@ public class PojoMapper {
             Set<JobTypeEntity> jobTypeEntitiesList = new HashSet<>();
             for (String jobType : job.getJobTypes()) {
                 JobTypeEntity jobTypeEntity = new JobTypeEntity();
-                jobTypeEntity.setType(jobType);
+                jobTypeEntity.setTypeName(jobType);
                 jobTypeEntitiesList.add(jobTypeEntity);
             }
             jobEntity.setTypes(jobTypeEntitiesList);

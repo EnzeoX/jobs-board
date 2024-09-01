@@ -12,10 +12,8 @@ import java.util.Set;
  * @author Nikolay Boyko
  */
 
-@Data
 @Entity
 @Builder
-@ToString
 @Table(name = "jobs")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -44,27 +42,133 @@ public class JobEntity {
     @Column(name = "created_at")
     private Date createdAt;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=JobCompanyEntity.class)
-    @JoinColumn(name = "company_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinTable(
+            name="companies",
+            joinColumns=@JoinColumn(name="job_id", referencedColumnName="job_id"),
+            inverseJoinColumns=@JoinColumn(name="company_id", referencedColumnName="company_id"))
     private JobCompanyEntity company = new JobCompanyEntity();
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=JobLocationEntity.class)
-    @JoinColumn(name = "location_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinTable(
+            name="locations",
+            joinColumns=@JoinColumn(name="job_id", referencedColumnName="job_id"),
+            inverseJoinColumns=@JoinColumn(name="location_id", referencedColumnName="location_id"))
     private JobLocationEntity location = new JobLocationEntity();
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=JobTagEntity.class)
-    @JoinTable(
-            name = "tags",
-            joinColumns = @JoinColumn(name = "job_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            },mappedBy = "jobs")
     private Set<JobTagEntity> tags = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "types",
-            joinColumns = @JoinColumn(name = "job_id"),
-            inverseJoinColumns = @JoinColumn(name = "type_id")
-    )
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            },mappedBy = "jobs")
     private Set<JobTypeEntity> types = new HashSet<>();
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isRemote() {
+        return remote;
+    }
+
+    public void setRemote(boolean remote) {
+        this.remote = remote;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public JobCompanyEntity getCompany() {
+        return company;
+    }
+
+    public void setCompany(JobCompanyEntity company) {
+        this.company = company;
+        this.company.getJobs().add(this);
+    }
+
+    public JobLocationEntity getLocation() {
+        return location;
+    }
+
+    public void setLocation(JobLocationEntity location) {
+        this.location = location;
+        this.location.getJobs().add(this);
+    }
+
+    public Set<JobTagEntity> getTags() {
+        return tags;
+    }
+
+    public void addTag(JobTagEntity tag) {
+        this.tags.add(tag);
+        tag.getJobs().add(this);
+    }
+
+    public void setTags(Set<JobTagEntity> tags) {
+        this.tags = tags;
+//        this.tags.forEach(tag -> tag.getJobs().add(this));
+    }
+
+    public Set<JobTypeEntity> getTypes() {
+        return types;
+    }
+
+    public void addType(JobTypeEntity type) {
+        this.types.add(type);
+        type.getJobs().add(this);
+    }
+
+    public void setTypes(Set<JobTypeEntity> types) {
+        this.types = types;
+//        this.types.forEach(type -> type.getJobs().add(this));
+    }
 }

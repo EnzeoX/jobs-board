@@ -1,8 +1,12 @@
 package com.faceit.faceittest.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,12 +30,14 @@ public class JobCompanyEntity {
     @Column(name = "company")
     private String companyName = "";
 
-    @ManyToMany(targetEntity = JobEntity.class,fetch = FetchType.LAZY)
-//    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "companies",
-            joinColumns = @JoinColumn(name = "company_id"),
-            inverseJoinColumns = @JoinColumn(name = "job_id")
-    )
-    private List<JobEntity> jobs;
+    //    @ManyToMany(targetEntity = JobEntity.class, fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "companies",
+//            joinColumns = @JoinColumn(name = "company_id"),
+//            inverseJoinColumns = @JoinColumn(name = "job_id")
+//    )
+    @JsonIgnore
+    @Fetch(FetchMode.JOIN)
+    @OneToMany(mappedBy = "company", fetch = FetchType.EAGER)
+    private List<JobEntity> jobs = new ArrayList<>();
 }

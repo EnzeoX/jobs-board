@@ -10,5 +10,5 @@ import java.util.Optional;
  */
 public interface JobLocationRepository extends JpaRepository<JobLocationEntity, Integer> {
 
-    Optional<JobLocationEntity> findByLocation(String location);
+    JobLocationEntity findByLocationName(String location);
 }
