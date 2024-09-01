@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
 
 import java.util.List;
 
@@ -22,19 +21,19 @@ import java.util.List;
 public class JobTypeEntity {
 
     @Id
-    @Column(name = "type_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "type_id", nullable = false, unique = true)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     @Column(name = "type", nullable = false, unique = true)
     private String type;
 
-    //    @ManyToMany(mappedBy = "types", cascade=CascadeType.ALL)
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "types",
-            joinColumns = @JoinColumn(name = "type_id"),
-            inverseJoinColumns = @JoinColumn(name = "job_id")
-    )
+    @ManyToMany(targetEntity = JobEntity.class,fetch = FetchType.LAZY)
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "types",
+//            joinColumns = @JoinColumn(name = "type_id"),
+//            inverseJoinColumns = @JoinColumn(name = "job_id")
+//    )
     private List<JobEntity> jobs;
 }

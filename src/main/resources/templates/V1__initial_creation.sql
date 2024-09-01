@@ -26,14 +26,14 @@ CREATE TABLE IF NOT EXISTS jobs
 (
     job_id INT AUTO_INCREMENT PRIMARY KEY,
     slug VARCHAR(255) NOT NULL,
-    company_id INT,
-    tag_id INT,
-    type_id INT,
+--     company_id INT,
+--     tag_id INT,
+--     type_id INT,
     title VARCHAR(255) NOT NULL,
     description VARCHAR NOT NULL,
     remote BOOLEAN,
     url VARCHAR(255),
-    location_id INT,
+--     location_id INT,
     created_at TIMESTAMP
 );
 
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS locations
     FOREIGN KEY (location_id) REFERENCES job_locations (location_id)
 );
 
-ALTER TABLE jobs ADD FOREIGN KEY (tag_id) REFERENCES tags(tag_id);
-ALTER TABLE jobs ADD FOREIGN KEY (type_id) REFERENCES types(type_id);
-ALTER TABLE jobs ADD FOREIGN KEY (company_id) REFERENCES companies(company_id);
-ALTER TABLE jobs ADD FOREIGN KEY (location_id) REFERENCES locations(location_id);
+-- ALTER TABLE jobs ADD FOREIGN KEY (tag_id) REFERENCES tags(tag_id);
+-- ALTER TABLE jobs ADD FOREIGN KEY (type_id) REFERENCES types(type_id);
+-- ALTER TABLE jobs ADD FOREIGN KEY (company_id) REFERENCES companies(company_id);
+-- ALTER TABLE jobs ADD FOREIGN KEY (location_id) REFERENCES locations(location_id);

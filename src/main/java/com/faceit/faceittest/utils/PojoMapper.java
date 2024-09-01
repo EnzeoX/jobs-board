@@ -6,7 +6,9 @@ import com.faceit.faceittest.models.JobsData;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Nikolay Boyko
@@ -69,7 +71,7 @@ public class PojoMapper {
             jobEntities.add(jobEntity);
 
             jobEntity.setSlug(job.getSlug());
-            jobEntity.setTitle(jobEntity.getTitle());
+            jobEntity.setTitle(job.getTitle());
             jobEntity.setDescription(job.getDescription());
             jobEntity.setRemote(job.isRemote());
             jobEntity.setUrl(job.getUrl());
@@ -78,7 +80,7 @@ public class PojoMapper {
             // Set company
             JobCompanyEntity jobCompanyEntity = new JobCompanyEntity();
             jobCompanyEntity.setCompanyName(job.getCompanyName());
-            jobEntity.setCompany(jobCompanyEntity);
+//            jobEntity.setCompany(jobCompanyEntity);
 
             // Set location
             JobLocationEntity jobLocationEntity = new JobLocationEntity();
@@ -86,7 +88,7 @@ public class PojoMapper {
             jobEntity.setLocation(jobLocationEntity);
 
             // Set tags
-            List<JobTagEntity> jobTagEntityList = new ArrayList<>();
+            Set<JobTagEntity> jobTagEntityList = new HashSet<>();
             for (String jobTag : job.getJobTags()) {
                 JobTagEntity jobTagEntity = new JobTagEntity();
                 jobTagEntity.setTag(jobTag);
@@ -95,7 +97,7 @@ public class PojoMapper {
             jobEntity.setTags(jobTagEntityList);
 
             // Set types
-            List<JobTypeEntity> jobTypeEntitiesList = new ArrayList<>();
+            Set<JobTypeEntity> jobTypeEntitiesList = new HashSet<>();
             for (String jobType : job.getJobTypes()) {
                 JobTypeEntity jobTypeEntity = new JobTypeEntity();
                 jobTypeEntity.setType(jobType);

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Nikolay Boyko
@@ -42,17 +43,17 @@ public class JobService {
         JobCompanyEntity jobCompanyEntity = JobCompanyEntity.builder()
                 .companyName("forty-five Personalberatung Wiesbaden GmbH & Co. KG")
                 .build();
-        jobEntity.setCompany(jobCompanyEntity);
+//        jobEntity.setCompany(jobCompanyEntity);
 
         List<JobTagEntity> jobTagEntityList = List.of(JobTagEntity.builder()
                 .tag("Electrical Engineering")
                 .build());
-        jobEntity.setTags(jobTagEntityList);
+//        jobEntity.setTags(jobTagEntityList);
 
         JobLocationEntity jobLocationEntity = JobLocationEntity.builder()
                 .location("Lübeck")
                 .build();
-        jobEntity.setLocation(jobLocationEntity);
+//        jobEntity.setLocation(jobLocationEntity);
         saveAll(list);
     }
 
@@ -88,10 +89,17 @@ public class JobService {
     public void processCollectedData(JobsData data) {
         if (data == null) throw new NullPointerException("Provided data is null!");
         List<JobEntity> list = PojoMapper.jobDataToJobEntities(data);
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             log.warn("List is null or empty, nothing to save in DB");
             return;
         }
+//        for (JobEntity jobEntity : list) {
+//            if (jobEntity == null) return;
+//            Optional<JobCompanyEntity> jobCompanyEntity = jobCompanyRepository.findOne(Example.of(jobEntity.getCompany()));
+//            if (jobCompanyEntity.isPresent()) {
+//
+//            }
+//        }
         jobRepository.saveAll(list);
     }
 

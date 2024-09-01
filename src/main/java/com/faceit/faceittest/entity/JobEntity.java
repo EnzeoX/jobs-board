@@ -2,10 +2,10 @@ package com.faceit.faceittest.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Cascade;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Nikolay Boyko
@@ -31,7 +31,7 @@ public class JobEntity {
     @Column(name = "title", nullable = false)
     private String title = "";
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, length = 50000)
     private String description = "";
 
     @Column(name = "remote")
@@ -43,27 +43,27 @@ public class JobEntity {
     @Column(name = "created_at")
     private Date createdAt;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=JobCompanyEntity.class)
-    @JoinColumn(name = "company_id")
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=JobCompanyEntity.class)
+//    @JoinColumn(name = "company_id")
     private JobCompanyEntity company;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=JobLocationEntity.class)
-    @JoinColumn(name = "location_id")
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=JobLocationEntity.class)
+//    @JoinColumn(name = "location_id")
     private JobLocationEntity location;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=JobTagEntity.class)
-    @JoinTable(
-            name = "tags",
-            joinColumns = @JoinColumn(name = "job_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private List<JobTagEntity> tags;
+//    @JoinTable(
+//            name = "tags",
+//            joinColumns = @JoinColumn(name = "job_id"),
+//            inverseJoinColumns = @JoinColumn(name = "tag_id")
+//    )
+    private Set<JobTagEntity> tags;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=JobTypeEntity.class)
-    @JoinTable(
-            name = "types",
-            joinColumns = @JoinColumn(name = "job_id"),
-            inverseJoinColumns = @JoinColumn(name = "type_id")
-    )
-    private List<JobTypeEntity> types;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @JoinTable(
+//            name = "types",
+//            joinColumns = @JoinColumn(name = "job_id"),
+//            inverseJoinColumns = @JoinColumn(name = "type_id")
+//    )
+    private Set<JobTypeEntity> types;
 }

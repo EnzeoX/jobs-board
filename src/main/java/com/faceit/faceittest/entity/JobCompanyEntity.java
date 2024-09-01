@@ -19,19 +19,19 @@ import java.util.List;
 public class JobCompanyEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "company_id", unique = true, nullable = false)
     private int id;
 
     @Column(name = "company")
     private String companyName;
 
-    //    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "companies",
-            joinColumns = @JoinColumn(name = "company_id"),
-            inverseJoinColumns = @JoinColumn(name = "job_id")
-    )
+    @ManyToMany(targetEntity = JobEntity.class,fetch = FetchType.LAZY)
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "companies",
+//            joinColumns = @JoinColumn(name = "company_id"),
+//            inverseJoinColumns = @JoinColumn(name = "job_id")
+//    )
     private List<JobEntity> jobs;
 }

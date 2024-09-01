@@ -21,18 +21,18 @@ public class JobLocationEntity {
 
     @Id
     @Column(name = "location_id", nullable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     @Column(name = "location", unique = true, nullable = false)
     private String location;
 
-    //    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "locations",
-            joinColumns = @JoinColumn(name = "location_id"),
-            inverseJoinColumns = @JoinColumn(name = "job_id")
-    )
+    @ManyToMany(targetEntity = JobEntity.class,fetch = FetchType.LAZY)
+//    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "locations",
+//            joinColumns = @JoinColumn(name = "location_id"),
+//            inverseJoinColumns = @JoinColumn(name = "job_id")
+//    )
     private List<JobEntity> jobs;
 }
