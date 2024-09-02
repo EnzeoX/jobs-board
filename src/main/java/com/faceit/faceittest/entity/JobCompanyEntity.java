@@ -8,6 +8,7 @@ import org.hibernate.annotations.FetchMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Nikolay Boyko
@@ -40,4 +41,17 @@ public class JobCompanyEntity {
     @Fetch(FetchMode.JOIN)
     @OneToMany(mappedBy = "company", fetch = FetchType.EAGER)
     private List<JobEntity> jobs = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JobCompanyEntity that = (JobCompanyEntity) o;
+        return companyName.equals(that.companyName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(companyName);
+    }
 }

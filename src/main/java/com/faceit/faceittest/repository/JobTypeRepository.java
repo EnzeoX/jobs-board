@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.Query;
  */
 public interface JobTypeRepository extends JpaRepository<JobTypeEntity, Integer> {
 
-    @Query(value = "select * from job_types where type_name=:type", nativeQuery = true)
-    JobTypeEntity findByTypeName(String type);
+    @Query(value = "select * from job_types where type_name = :typeName", nativeQuery = true)
+    JobTypeEntity findByTypeName(String typeName);
 }

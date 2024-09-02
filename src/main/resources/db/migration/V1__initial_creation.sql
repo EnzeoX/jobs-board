@@ -4,11 +4,15 @@ CREATE TABLE IF NOT EXISTS job_companies
     company VARCHAR(255) NOT NULL UNIQUE
 );
 
+CREATE SEQUENCE job_companies_seq START WITH 1 INCREMENT BY 50;
+
 CREATE TABLE IF NOT EXISTS job_locations
 (
     location_id INT AUTO_INCREMENT PRIMARY KEY,
     location VARCHAR(255) NOT NULL UNIQUE
 );
+
+CREATE SEQUENCE job_locations_seq START WITH 1 INCREMENT BY 50;
 
 CREATE TABLE IF NOT EXISTS job_tags
 (
@@ -16,24 +20,24 @@ CREATE TABLE IF NOT EXISTS job_tags
     tag VARCHAR(255) NOT NULL UNIQUE
 );
 
+CREATE SEQUENCE job_tags_seq START WITH 1 INCREMENT BY 50;
+
 CREATE TABLE IF NOT EXISTS job_types
 (
     type_id INT AUTO_INCREMENT PRIMARY KEY,
     type_name VARCHAR(255) NOT NULL UNIQUE
 );
 
+CREATE SEQUENCE job_types_seq START WITH 1 INCREMENT BY 50;
+
 CREATE TABLE IF NOT EXISTS jobs
 (
     job_id INT AUTO_INCREMENT PRIMARY KEY,
     slug VARCHAR(255) NOT NULL,
---     company_id INT,
---     tag_id INT,
---     type_id INT,
     title VARCHAR(255) NOT NULL,
     description VARCHAR NOT NULL,
     remote BOOLEAN,
     url VARCHAR(255),
---     location_id INT,
     created_at TIMESTAMP
 );
 

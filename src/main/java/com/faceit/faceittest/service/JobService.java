@@ -1,6 +1,7 @@
 package com.faceit.faceittest.service;
 
 import com.faceit.faceittest.entity.*;
+import com.faceit.faceittest.models.Job;
 import com.faceit.faceittest.models.JobsData;
 import com.faceit.faceittest.repository.*;
 import com.faceit.faceittest.utils.PojoMapper;
@@ -75,7 +76,7 @@ public class JobService {
     }
 
     public void saveAll(List<JobEntity> jobs) {
-        jobRepository.saveAll(jobs);
+        jobs.forEach(this::save);
     }
 
     public void processAndSave(String jsonData) {
@@ -95,64 +96,61 @@ public class JobService {
             return;
         }
         for (JobEntity job : list) {
-            if (job == null) return;
-
-            JobCompanyEntity company = job.getCompany();
-            JobCompanyEntity existingCompany = jobCompanyRepository.findByCompanyName(company.getCompanyName());
-            if (existingCompany != null) {
-                job.setCompany(existingCompany);
-            } else {
-                job.setCompany(jobCompanyRepository.save(company));
-            }
-
-            JobLocationEntity location = job.getLocation();
-            JobLocationEntity existingLocation = jobLocationRepository.findByLocationName(location.getLocationName());
-            if (existingLocation != null) {
-                job.setLocation(existingLocation);
-            } else {
-                job.setLocation(jobLocationRepository.save(location));
-            }
-
-            Set<JobTagEntity> tags = job.getTags();
-            Set<JobTagEntity> savedTags = new HashSet<>();
-            for (JobTagEntity tag : tags) {
-                if (tag.getTagName().equals("Remote")) {
-                    log.info("Remote tag");
-                }
-                JobTagEntity existingTag = jobTagRepository.findByTagName(tag.getTagName());
-                if (existingTag == null) {
-                    try {
-                        savedTags.add(jobTagRepository.save(tag));
-                    } catch (DataIntegrityViolationException e) {
-                        // Handle unique constraint violation
-                        existingTag = jobTagRepository.findByTagName(tag.getTagName());
-                        if (existingTag != null) {
-                            savedTags.add(existingTag);
-                        } else {
-                            throw e; // Re-throw if the error is not due to duplication
-                        }
-                    }
-                } else {
-                    existingTag.getJobs().add(job);
-                }
-                savedTags.add(existingTag);
-            }
-            job.setTags(savedTags);
-
-            Set<JobTypeEntity> types = job.getTypes();
-            Set<JobTypeEntity> savedTypes = new HashSet<>();
-            for (JobTypeEntity type : types) {
-                JobTypeEntity existingType = jobTypeRepository.findByTypeName(type.getTypeName());
-                if (existingType != null) {
-                    existingType.getJobs().add(job);
-                } else {
-                    existingType = jobTypeRepository.save(type);
-                }
-                savedTypes.add(existingType);
-            }
-            job.setTypes(savedTypes);
-
-            jobRepository.save(job);
+            save(job);
         }
+    }
+
+    @Transactional
+    public void save(JobEntity job) {
+        if (job == null) return;
+
+        JobCompanyEntity company = job.getCompany();
+        JobCompanyEntity existingCompany = jobCompanyRepository.findByCompanyName(company.getCompanyName());
+        job.setCompany(
+                Objects.requireNonNullElseGet(existingCompany,
+                        () -> jobCompanyRepository.save(company))
+        );
+
+        JobLocationEntity location = job.getLocation();
+        JobLocationEntity existingLocation = jobLocationRepository.findByLocationName(location.getLocationName());
+        job.setLocation(
+                Objects.requireNonNullElseGet(existingLocation,
+                        () -> jobLocationRepository.save(location))
+        );
+
+        Set<JobTagEntity> tags = job.getTags();
+        Set<JobTagEntity> savedTags = new HashSet<>();
+        for (JobTagEntity tag : tags) {
+            JobTagEntity existingTag = jobTagRepository.findByTagName(tag.getTagName());
+            if (existingTag != null) {
+                log.info("Job tag \"{}\" found with id \"{}\"", existingTag.getTagName(), existingTag.getId());
+//                existingTag.getJobs().add(job);
+//                existingTag = jobTagRepository.save(tag);
+            } else {
+                log.info("No job tag with name \"{}\" found, saving new", tag.getTagName());
+//                existingTag = jobTagRepository.save(tag);
+                existingTag = tag;
+            }
+            savedTags.add(existingTag);
+        }
+        job.setTags(savedTags);
+
+        Set<JobTypeEntity> types = job.getTypes();
+        Set<JobTypeEntity> savedTypes = new HashSet<>();
+        for (JobTypeEntity type : types) {
+            JobTypeEntity existingType = jobTypeRepository.findByTypeName(type.getTypeName());
+            if (existingType != null) {
+                log.info("Job type \"{}\" found with id \"{}\"", existingType.getTypeName(), existingType.getId());
+//                existingType.getJobs().add(job);
+//                existingType = jobTypeRepository.save(type);
+            } else {
+                log.info("No job type with name \"{}\" found, saving new", type.getTypeName());
+                existingType = jobTypeRepository.save(type);
+            }
+            savedTypes.add(existingType);
+        }
+        job.setTypes(savedTypes);
+        log.info("Saving job entity {}", job);
+        jobRepository.save(job);
     }
 }

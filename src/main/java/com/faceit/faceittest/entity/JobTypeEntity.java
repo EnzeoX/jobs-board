@@ -19,7 +19,6 @@ import java.util.Set;
 @Table(name = "job_types", uniqueConstraints = {
         @UniqueConstraint(columnNames = "type_name")
 })
-@EqualsAndHashCode(exclude = "jobs")
 public class JobTypeEntity {
 
     @Id
@@ -30,11 +29,7 @@ public class JobTypeEntity {
     @Column(name = "type_name", nullable = false, unique = true)
     private String typeName = "";
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
     @JoinTable(
             name = "types",
             joinColumns = @JoinColumn(name = "type_id"),
@@ -42,16 +37,16 @@ public class JobTypeEntity {
     )
     private Set<JobEntity> jobs = new HashSet<>();
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        JobTypeEntity that = (JobTypeEntity) o;
-//        return typeName.equals(that.typeName);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(typeName);
-//    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JobTypeEntity that = (JobTypeEntity) o;
+        return typeName.equals(that.typeName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(typeName);
+    }
 }

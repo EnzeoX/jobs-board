@@ -3,10 +3,7 @@ package com.faceit.faceittest.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Nikolay Boyko
@@ -14,6 +11,7 @@ import java.util.Set;
 
 @Entity
 @Builder
+@ToString(exclude = "description")
 @Table(name = "jobs")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -44,30 +42,33 @@ public class JobEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinTable(
-            name="companies",
-            joinColumns=@JoinColumn(name="job_id", referencedColumnName="job_id"),
-            inverseJoinColumns=@JoinColumn(name="company_id", referencedColumnName="company_id"))
+            name = "companies",
+            joinColumns = @JoinColumn(name = "job_id", referencedColumnName = "job_id"),
+            inverseJoinColumns = @JoinColumn(name = "company_id", referencedColumnName = "company_id"))
     private JobCompanyEntity company = new JobCompanyEntity();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinTable(
-            name="locations",
-            joinColumns=@JoinColumn(name="job_id", referencedColumnName="job_id"),
-            inverseJoinColumns=@JoinColumn(name="location_id", referencedColumnName="location_id"))
+            name = "locations",
+            joinColumns = @JoinColumn(name = "job_id", referencedColumnName = "job_id"),
+            inverseJoinColumns = @JoinColumn(name = "location_id", referencedColumnName = "location_id"))
     private JobLocationEntity location = new JobLocationEntity();
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            },mappedBy = "jobs")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+    @JoinTable(
+            name = "tags",
+            joinColumns = @JoinColumn(name = "job_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
     private Set<JobTagEntity> tags = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            },mappedBy = "jobs")
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+    @JoinTable(
+            name = "types",
+            joinColumns = @JoinColumn(name = "job_id"),
+            inverseJoinColumns = @JoinColumn(name = "type_id")
+    )
     private Set<JobTypeEntity> types = new HashSet<>();
 
     public int getId() {
@@ -148,27 +149,34 @@ public class JobEntity {
         return tags;
     }
 
-    public void addTag(JobTagEntity tag) {
-        this.tags.add(tag);
-        tag.getJobs().add(this);
-    }
 
     public void setTags(Set<JobTagEntity> tags) {
         this.tags = tags;
-//        this.tags.forEach(tag -> tag.getJobs().add(this));
     }
 
     public Set<JobTypeEntity> getTypes() {
         return types;
     }
 
-    public void addType(JobTypeEntity type) {
-        this.types.add(type);
-        type.getJobs().add(this);
-    }
-
     public void setTypes(Set<JobTypeEntity> types) {
         this.types = types;
-//        this.types.forEach(type -> type.getJobs().add(this));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JobEntity jobEntity = (JobEntity) o;
+        return remote == jobEntity.remote
+                && slug.equals(jobEntity.slug)
+                && title.equals(jobEntity.title)
+                && description.equals(jobEntity.description)
+                && url.equals(jobEntity.url)
+                && createdAt.equals(jobEntity.createdAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(slug, title, description, remote, url, createdAt);
     }
 }

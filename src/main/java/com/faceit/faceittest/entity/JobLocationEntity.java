@@ -7,6 +7,7 @@ import org.hibernate.annotations.Cascade;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Nikolay Boyko
@@ -38,4 +39,17 @@ public class JobLocationEntity {
 //            inverseJoinColumns = @JoinColumn(name = "job_id")
 //    )
     private List<JobEntity> jobs = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JobLocationEntity that = (JobLocationEntity) o;
+        return locationName.equals(that.locationName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(locationName);
+    }
 }
