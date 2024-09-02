@@ -1,17 +1,12 @@
 package com.faceit.faceittest.service;
 
-import com.faceit.faceittest.models.JobsData;
-import com.faceit.faceittest.service.client.RemoteApiCall;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import retrofit2.Call;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -34,9 +29,13 @@ public class ScheduledService {
             log.info("Fetching data from remote resource");
             return remoteService.fetchPage();
         }).thenAcceptAsync((jobsData -> {
-            log.info("Fetching complete, processing collected data");
+            long start = System.currentTimeMillis();
+            log.info("Fetching complete, processing collected data, time start: {}", start);
             jobService.processCollectedData(jobsData);
-            log.info("Data processing complete, new data saved");
+            long end = System.currentTimeMillis();
+            log.info("Data processing complete, new data saved. End time: {}. Elapsed time to save and process: {} ms",
+                    end,
+                    (end - start));
         }));
     }
 }

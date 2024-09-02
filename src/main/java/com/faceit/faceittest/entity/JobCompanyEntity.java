@@ -17,7 +17,6 @@ import java.util.Objects;
 @Data
 @Entity
 @Builder
-@ToString(exclude = "jobs")
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "job_companies")
@@ -31,12 +30,6 @@ public class JobCompanyEntity {
     @Column(name = "company")
     private String companyName = "";
 
-    //    @ManyToMany(targetEntity = JobEntity.class, fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = "companies",
-//            joinColumns = @JoinColumn(name = "company_id"),
-//            inverseJoinColumns = @JoinColumn(name = "job_id")
-//    )
     @JsonIgnore
     @Fetch(FetchMode.JOIN)
     @OneToMany(mappedBy = "company", fetch = FetchType.EAGER)

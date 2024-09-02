@@ -67,8 +67,12 @@ public class JobService {
 
     private final ObjectMapper mapper;
 
-    public List<JobEntity> getAllJobs() {
-        return jobRepository.findAll();
+    public List<Job> getAllJobs() {
+        List<JobEntity> jobEntities = jobRepository.findAll();
+        if (jobEntities.size() == 0) return new ArrayList<>();
+        return jobEntities.stream()
+                .map(PojoMapper::jobEntityToJob)
+                .toList();
     }
 
     public Page<JobEntity> getAllPaginated(Pageable pageable) {
@@ -104,6 +108,11 @@ public class JobService {
     public void save(JobEntity job) {
         if (job == null) return;
 
+        // Check if JobEntity exists in DB
+        if (jobRepository.findJobEntityBySlug(job.getSlug()) != null) {
+            return;
+        }
+
         JobCompanyEntity company = job.getCompany();
         JobCompanyEntity existingCompany = jobCompanyRepository.findByCompanyName(company.getCompanyName());
         job.setCompany(
@@ -121,36 +130,20 @@ public class JobService {
         Set<JobTagEntity> tags = job.getTags();
         Set<JobTagEntity> savedTags = new HashSet<>();
         for (JobTagEntity tag : tags) {
-            JobTagEntity existingTag = jobTagRepository.findByTagName(tag.getTagName());
-            if (existingTag != null) {
-                log.info("Job tag \"{}\" found with id \"{}\"", existingTag.getTagName(), existingTag.getId());
-//                existingTag.getJobs().add(job);
-//                existingTag = jobTagRepository.save(tag);
-            } else {
-                log.info("No job tag with name \"{}\" found, saving new", tag.getTagName());
-//                existingTag = jobTagRepository.save(tag);
-                existingTag = tag;
-            }
-            savedTags.add(existingTag);
+            savedTags.add(Objects.requireNonNullElseGet(jobTagRepository.findByTagName(tag.getTagName()),
+                    () -> jobTagRepository.save(tag)));
         }
         job.setTags(savedTags);
 
         Set<JobTypeEntity> types = job.getTypes();
         Set<JobTypeEntity> savedTypes = new HashSet<>();
         for (JobTypeEntity type : types) {
-            JobTypeEntity existingType = jobTypeRepository.findByTypeName(type.getTypeName());
-            if (existingType != null) {
-                log.info("Job type \"{}\" found with id \"{}\"", existingType.getTypeName(), existingType.getId());
-//                existingType.getJobs().add(job);
-//                existingType = jobTypeRepository.save(type);
-            } else {
-                log.info("No job type with name \"{}\" found, saving new", type.getTypeName());
-                existingType = jobTypeRepository.save(type);
-            }
-            savedTypes.add(existingType);
+            savedTypes.add(Objects.requireNonNullElseGet(jobTypeRepository.findByTypeName(type.getTypeName()),
+                    () -> jobTypeRepository.save(type)));
         }
         job.setTypes(savedTypes);
-        log.info("Saving job entity {}", job);
+
+        // check if exists and if not - save
         jobRepository.save(job);
     }
 }

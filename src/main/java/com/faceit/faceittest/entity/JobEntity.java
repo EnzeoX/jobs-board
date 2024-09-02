@@ -11,7 +11,6 @@ import java.util.*;
 
 @Entity
 @Builder
-@ToString(exclude = "description")
 @Table(name = "jobs")
 @NoArgsConstructor
 @AllArgsConstructor
