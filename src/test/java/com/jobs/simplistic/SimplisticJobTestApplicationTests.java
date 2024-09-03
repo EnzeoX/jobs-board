@@ -1,10 +1,10 @@
-package com.faceit.faceittest;
+package com.jobs.simplistic;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class FaceItTestApplicationTests {
+class SimplisticJobTestApplicationTests {
 
     @Test
     void contextLoads() {
