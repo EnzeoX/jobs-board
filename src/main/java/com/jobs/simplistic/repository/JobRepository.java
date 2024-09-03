@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +40,6 @@ public interface JobRepository extends JpaRepository<JobEntity, Integer> {
 
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM jobs j WHERE j.added_at < DATEADD('DAY', -:days, CURRENT_DATE)", nativeQuery = true)
-    int deleteOlderThanDays(@Param("days") int days);
+    @Query("DELETE FROM JobEntity j WHERE j.createdAt <= :date")
+    int deleteOlderThanDate(@Param("date") Date date);
 }

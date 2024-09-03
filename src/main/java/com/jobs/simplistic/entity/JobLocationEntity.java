@@ -29,13 +29,7 @@ public class JobLocationEntity {
     private String locationName = "";
 
 
-    @OneToMany(mappedBy = "location", fetch = FetchType.EAGER)
-//    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = "locations",
-//            joinColumns = @JoinColumn(name = "location_id"),
-//            inverseJoinColumns = @JoinColumn(name = "job_id")
-//    )
+    @OneToMany(mappedBy = "location", fetch = FetchType.EAGER, orphanRemoval = true)
     private List<JobEntity> jobs = new ArrayList<>();
 
     @Override

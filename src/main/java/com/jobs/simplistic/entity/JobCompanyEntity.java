@@ -3,6 +3,7 @@ package com.jobs.simplistic.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -32,7 +33,7 @@ public class JobCompanyEntity {
 
     @JsonIgnore
     @Fetch(FetchMode.JOIN)
-    @OneToMany(mappedBy = "company", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "company", fetch = FetchType.EAGER, orphanRemoval = true)
     private List<JobEntity> jobs = new ArrayList<>();
 
     @Override

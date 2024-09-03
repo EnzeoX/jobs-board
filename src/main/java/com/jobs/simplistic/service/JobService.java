@@ -110,11 +110,11 @@ public class JobService {
         }
         job.setTypes(savedTypes);
 
-        // check if exists and if not - save
         jobRepository.save(job);
     }
 
+    @Transactional
     public int deleteOlderThan(int olderThan) {
-        return jobRepository.deleteOlderThanDays(olderThan);
+        return jobRepository.deleteOlderThanDate(new Date(new Date().getTime() - olderThan * 24 * 60 * 60 * 1000L));
     }
 }

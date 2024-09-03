@@ -22,14 +22,12 @@ public class ScheduledService {
     @Value("#{new Integer('${scheduled.data.old}')}")
     private final int olderThan = 30;
 
-//    @Value("scheduled.cron.value.fetch")
     private final String FETCH_TIME = "0 0 */1 * * *";
 
-//    @Value("scheduled.cron.value.delete-old")
-    private final String DELETE_TIME = "*/10 * * * * *";
+    private final String DELETE_TIME = "0 0 */1 * * *";
 
-    @Value("scheduled.pages.value")
-    private final static int pagesToCollect = 1;
+//    @Value("#{new Integer('${scheduled.pages.value')}")
+    private final int pagesToCollect = 5;
 
     private final JobService jobService;
     private final RemoteService remoteService;
@@ -39,7 +37,7 @@ public class ScheduledService {
 
     @PostConstruct
     public void showInfo() {
-        log.info("{} info: {} - {}; {} - {};",
+        log.info("{} info: {} - {}; {} - {}; {} - {};",
                 this.getClass().getSimpleName(),
                 "FETCH_TIME",
                 FETCH_TIME,
