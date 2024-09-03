@@ -67,6 +67,7 @@ public class JobService {
 
     private final ObjectMapper mapper;
 
+    // Not save, probably will poorly perform with high count of data
     public List<Job> getAllJobs() {
         List<JobEntity> jobEntities = jobRepository.findAll();
         if (jobEntities.size() == 0) return new ArrayList<>();
@@ -75,20 +76,13 @@ public class JobService {
                 .toList();
     }
 
-    public Page<JobEntity> getAllPaginated(Pageable pageable) {
-        return jobRepository.findAll(pageable);
+    public Page<Job> getAllPaginated(Pageable pageable) {
+        Page<JobEntity> entities = jobRepository.findAll(pageable);
+        return entities.map(PojoMapper::jobEntityToJob);
     }
 
     public void saveAll(List<JobEntity> jobs) {
         jobs.forEach(this::save);
-    }
-
-    public void processAndSave(String jsonData) {
-        try {
-            processCollectedData(mapper.readValue(jsonData, JobsData.class));
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
     }
 
     @Transactional
@@ -99,9 +93,7 @@ public class JobService {
             log.warn("List is null or empty, nothing to save in DB");
             return;
         }
-        for (JobEntity job : list) {
-            save(job);
-        }
+        saveAll(list);
     }
 
     @Transactional
