@@ -29,9 +29,9 @@ by default it's "title"
 ````
 
 ### Get jobs statistics:
-|Method | Endpoint                    | Description                                                  |
-|-------| ----------------------------| -------------------------------------------------------------|
-| `GET` | `/api/v1/statistics?order=?`| Returns statistics for every location by available jobs count|
+|Method | Endpoint                    | Description                                                    |
+|-------| ----------------------------| ---------------------------------------------------------------|
+| `GET` | `/api/v1/statistics?order=?`| Returns statistics for every location available with jobs count|
 
 
 Available parameters:
