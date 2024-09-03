@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS jobs
     description VARCHAR NOT NULL,
     remote BOOLEAN,
     url VARCHAR(255),
-    created_at TIMESTAMP
+    created_at TIMESTAMP,
+    added_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS tags
